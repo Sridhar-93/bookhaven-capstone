@@ -89,6 +89,15 @@ The supplied capstone asks learners to use an Agentic IDE and explain the develo
 4. **Testing:** "Generate component and API tests for catalogue filtering, cart totals, gift points, checkout validation, order history and the 48-hour cancellation rule."
 5. **Code quality:** "Review the project for reusable components, naming, duplicate logic, accessibility and security risks. Explain each proposed change before applying it."
 
+## Recent fixes
+
+- **Search input** — typing in the search bar no longer drops focus. Root cause
+  was `Header`, `BookCard`, and `Footer` being defined inside `App`, causing
+  React to remount them on every render. All three are now top-level components.
+- **Order confirmation titles** — book titles now appear correctly on the success
+  page and order history. `placeOrder` previously saved items as `{ id, qty }`;
+  changed to `{ bookId, qty }` to match what the order lookup expects.
+
 ## Suggested Git workflow
 
 ```bash
