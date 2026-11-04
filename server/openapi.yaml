@@ -1,0 +1,95 @@
+openapi: 3.0.3
+info:
+  title: BookHaven Bookstore API
+  version: 1.0.0
+  description: Capstone API for catalogue, order checkout, cancellation and recommendations.
+servers:
+  - url: http://localhost:4000
+paths:
+  /api/health:
+    get:
+      summary: Check API and database health
+      responses:
+        '200': {description: Healthy}
+        '503': {description: Database unavailable}
+  /api/books:
+    get:
+      summary: Browse books
+      parameters:
+        - in: query
+          name: category
+          schema: {type: string}
+        - in: query
+          name: brand
+          schema: {type: string}
+        - in: query
+          name: q
+          schema: {type: string}
+      responses:
+        '200': {description: Book catalogue}
+  /api/books/{id}:
+    get:
+      summary: Get a book
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: {type: integer}
+      responses:
+        '200': {description: Book details}
+        '404': {description: Not found}
+  /api/orders:
+    get:
+      summary: Get order history
+      parameters:
+        - in: query
+          name: email
+          required: true
+          schema: {type: string, format: email}
+      responses:
+        '200': {description: Orders}
+    post:
+      summary: Place an order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [customerEmail, items, address, paymentMethod]
+              properties:
+                customerEmail: {type: string, format: email}
+                items:
+                  type: array
+                  items:
+                    type: object
+                    required: [bookId, quantity]
+                    properties:
+                      bookId: {type: integer}
+                      quantity: {type: integer, minimum: 1}
+                address: {type: object}
+                paymentMethod: {type: string, enum: [UPI, Card, Cash on Delivery]}
+                giftPoints: {type: integer, minimum: 0, maximum: 100}
+      responses:
+        '201': {description: Order created}
+        '400': {description: Invalid order}
+  /api/orders/{id}/cancel:
+    post:
+      summary: Cancel a confirmed order within 48 hours
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: {type: integer}
+      responses:
+        '200': {description: Cancelled}
+        '409': {description: Cancellation window closed or order not eligible}
+  /api/recommendations:
+    get:
+      summary: Get recommendations using purchase history
+      parameters:
+        - in: query
+          name: email
+          schema: {type: string}
+      responses:
+        '200': {description: Recommended books}
